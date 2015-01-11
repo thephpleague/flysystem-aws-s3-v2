@@ -1,0 +1,35 @@
+{
+    "name": "league/flysystem-aws-s3-v2",
+    "description": "Flysystem adapter for AWS S3 SDK V2",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Frank de Jonge",
+            "email": "info@frenky.net"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "league/flysystem": "~1.0@dev",
+        "aws/aws-sdk-php": "~2.7"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0",
+        "mockery/mockery": "0.9.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "League\\Flysystem\\AwsS3V2\\": "src/"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "min-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
