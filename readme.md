@@ -12,7 +12,7 @@
 ## Installation
 
 ```bash
-composer require league\flysystem-aws-s3-v2
+composer require league/flysystem-aws-s3-v2
 ```
 
 ## Usage
