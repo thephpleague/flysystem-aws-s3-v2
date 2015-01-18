@@ -60,7 +60,7 @@ class AwsS3Adapter extends AbstractAdapter
      *            ]
      */
     protected $options = [
-        'Multipart' => 1024,
+        'Multipart'   => 1024,
         'MinPartSize' => 32,
         'Concurrency' => 3,
     ];
@@ -254,9 +254,9 @@ class AwsS3Adapter extends AbstractAdapter
     public function rename($path, $newpath)
     {
         $options = $this->getOptions($newpath, [
-            'Bucket' => $this->bucket,
+            'Bucket'     => $this->bucket,
             'CopySource' => $this->bucket.'/'.$this->applyPathPrefix($path),
-            'ACL' => $this->getObjectACL($path),
+            'ACL'        => $this->getObjectACL($path),
         ]);
 
         $this->client->copyObject($options);
@@ -271,9 +271,9 @@ class AwsS3Adapter extends AbstractAdapter
     public function copy($path, $newpath)
     {
         $options = $this->getOptions($newpath, [
-            'Bucket' => $this->bucket,
+            'Bucket'     => $this->bucket,
             'CopySource' => $this->bucket.'/'.$this->applyPathPrefix($path),
-            'ACL' => $this->getObjectACL($path),
+            'ACL'        => $this->getObjectACL($path),
         ]);
 
         $this->client->copyObject($options)->getAll();
