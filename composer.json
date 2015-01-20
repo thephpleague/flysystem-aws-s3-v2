@@ -1,6 +1,6 @@
 {
     "name": "league/flysystem-aws-s3-v2",
-    "description": "Flysystem adapter for AWS S3 SDK V2",
+    "description": "Flysystem adapter for AWS S3 SDK v2",
     "license": "MIT",
     "authors": [
         {
@@ -19,7 +19,7 @@
     },
     "autoload": {
         "psr-4": {
-            "League\\Flysystem\\AwsS3V2\\": "src/"
+            "League\\Flysystem\\AwsS3v2\\": "src/"
         }
     },
     "config": {
