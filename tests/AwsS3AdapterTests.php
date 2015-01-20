@@ -3,7 +3,7 @@
 use Aws\S3\Enum\Group;
 use Aws\S3\Enum\Permission;
 use Guzzle\Service\Resource\Model;
-use League\Flysystem\AwsS3V2\AwsS3Adapter as Adapter;
+use League\Flysystem\AwsS3v2\AwsS3Adapter as Adapter;
 use League\Flysystem\Config;
 
 class StreamMock

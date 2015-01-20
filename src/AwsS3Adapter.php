@@ -1,6 +1,6 @@
 <?php
 
-namespace League\Flysystem\AwsS3V2;
+namespace League\Flysystem\AwsS3v2;
 
 use Aws\Common\Exception\MultipartUploadException;
 use Aws\S3\Enum\Group;
