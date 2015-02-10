@@ -290,7 +290,7 @@ class AwsS3Adapter extends AbstractAdapter
         /** @var Model $response */
         $response = $this->client->deleteObject($options);
 
-        return $response->get('DeleteMarker');
+        return ! $this->has($path);
     }
 
     /**
