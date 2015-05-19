@@ -255,7 +255,7 @@ class AwsS3Adapter extends AbstractAdapter
     {
         $options = $this->getOptions($newpath, [
             'Bucket'     => $this->bucket,
-            'CopySource' => $this->bucket.'/'.$this->applyPathPrefix($path),
+            'CopySource' => urlencode($this->bucket.'/'.$this->applyPathPrefix($path)),
             'ACL'        => $this->getObjectACL($path),
         ]);
 
