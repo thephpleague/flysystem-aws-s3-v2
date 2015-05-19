@@ -230,7 +230,6 @@ class AwsS3Tests extends PHPUnit_Framework_TestCase
         $mock = $this->getS3Client();
         $this->expectVisibilityCall(Permission::READ, 'old', $mock);
         $mock->shouldReceive('copyObject')->once()->andReturn(Mockery::self());
-        $mock->shouldReceive('getAll')->once()->andReturn(['Key' => 'something', 'LastModified' => '2011-01-01']);
         $adapter = new Adapter($mock, 'bucketname');
         $result = $adapter->copy('old', 'new');
         $this->assertTrue($result);

@@ -253,13 +253,7 @@ class AwsS3Adapter extends AbstractAdapter
      */
     public function rename($path, $newpath)
     {
-        $options = $this->getOptions($newpath, [
-            'Bucket'     => $this->bucket,
-            'CopySource' => urlencode($this->bucket.'/'.$this->applyPathPrefix($path)),
-            'ACL'        => $this->getObjectACL($path),
-        ]);
-
-        $this->client->copyObject($options);
+        $this->copy($path, $newpath);
         $this->delete($path);
 
         return true;
@@ -272,11 +266,11 @@ class AwsS3Adapter extends AbstractAdapter
     {
         $options = $this->getOptions($newpath, [
             'Bucket'     => $this->bucket,
-            'CopySource' => $this->bucket.'/'.$this->applyPathPrefix($path),
+            'CopySource' => urlencode($this->bucket.'/'.$this->applyPathPrefix($path)),
             'ACL'        => $this->getObjectACL($path),
         ]);
 
-        $this->client->copyObject($options)->getAll();
+        $this->client->copyObject($options);
 
         return true;
     }
