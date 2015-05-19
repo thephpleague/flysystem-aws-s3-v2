@@ -287,8 +287,7 @@ class AwsS3Adapter extends AbstractAdapter
     public function delete($path)
     {
         $options = $this->getOptions($path);
-        /** @var Model $response */
-        $response = $this->client->deleteObject($options);
+        $this->client->deleteObject($options);
 
         return ! $this->has($path);
     }
