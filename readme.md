@@ -25,7 +25,7 @@ use League\Flysystem\Filesystem;
 $client = S3Client::factory(array(
     'key'    => '[your key]',
     'secret' => '[your secret]',
-    'region' => '[aws-region]'
+    'region' => '[aws-region]',
 ));
 
 $adapter = new AwsS3Adapter($client, 'bucket-name', 'optional-prefix');
