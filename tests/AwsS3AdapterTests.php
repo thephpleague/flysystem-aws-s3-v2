@@ -2,6 +2,7 @@
 
 use Aws\S3\Enum\Group;
 use Aws\S3\Enum\Permission;
+use Aws\S3\Enum\StorageClass;
 use Guzzle\Service\Resource\Model;
 use League\Flysystem\AwsS3v2\AwsS3Adapter as Adapter;
 use League\Flysystem\Config;
@@ -216,6 +217,8 @@ class AwsS3Tests extends PHPUnit_Framework_TestCase
     {
         $mock = $this->getS3Client();
         $this->expectVisibilityCall(Permission::READ, 'old', $mock);
+        $mock->shouldReceive('headObject')->once()->andReturn(Mockery::self());
+        $mock->shouldReceive('getAll')->once()->andReturn(['ContentLength' => 20, 'ContentType' => 'text/plain', 'StorageClass' => StorageClass::STANDARD]);
         $mock->shouldReceive('copyObject')->once()->andReturn(Mockery::self());
         $response = Mockery::mock('Guzzle\Service\Resource\Model');
         $mock->shouldReceive('deleteObject')->once()->andReturn($response);
@@ -229,6 +232,8 @@ class AwsS3Tests extends PHPUnit_Framework_TestCase
     {
         $mock = $this->getS3Client();
         $this->expectVisibilityCall(Permission::READ, 'old', $mock);
+        $mock->shouldReceive('headObject')->once()->andReturn(Mockery::self());
+        $mock->shouldReceive('getAll')->once()->andReturn(['ContentLength' => 20, 'ContentType' => 'text/plain', 'StorageClass' => StorageClass::STANDARD]);
         $mock->shouldReceive('copyObject')->once()->andReturn(Mockery::self());
         $adapter = new Adapter($mock, 'bucketname');
         $result = $adapter->copy('old', 'new');
@@ -317,6 +322,29 @@ class AwsS3Tests extends PHPUnit_Framework_TestCase
         $adapter = new Adapter($mock, 'bucketname');
         $result = $adapter->{$method}('object.ext');
         $this->assertInternalType('array', $result);
+    }
+
+    public function storageClassProvider()
+    {
+        return[
+            [['ContentLength' => 20, 'ContentType' => 'text/plain', 'StorageClass' => StorageClass::STANDARD]],
+            [['ContentLength' => 20, 'ContentType' => 'text/plain', 'StorageClass' => StorageClass::REDUCED_REDUNDANCY]],
+            [['ContentLength' => 20, 'ContentType' => 'text/plain']],
+            [['ContentLength' => 20, 'ContentType' => 'text/plain', 'StorageClass' => false]],
+        ];
+    }
+
+    /**
+     * @dataProvider  storageClassProvider
+     */
+    public function testStorageClass($metadata)
+    {
+        $mock = $this->getS3Client();
+        $mock->shouldReceive('headObject')->once()->andReturn(Mockery::self());
+        $mock->shouldReceive('getAll')->once()->andReturn($metadata);
+        $adapter = new Adapter($mock, 'bucketname');
+        $result = $adapter->getStorageClass('object.ext');
+        $this->assertTrue(!empty($result));
     }
 
     public function testCreateDir()

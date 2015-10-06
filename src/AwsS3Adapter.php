@@ -5,6 +5,7 @@ namespace League\Flysystem\AwsS3v2;
 use Aws\Common\Exception\MultipartUploadException;
 use Aws\S3\Enum\Group;
 use Aws\S3\Enum\Permission;
+use Aws\S3\Enum\StorageClass;
 use Aws\S3\Model\MultipartUpload\AbstractTransfer;
 use Aws\S3\Model\MultipartUpload\UploadBuilder;
 use Aws\S3\S3Client;
@@ -24,6 +25,7 @@ class AwsS3Adapter extends AbstractAdapter
         'ContentLength' => 'size',
         'ContentType'   => 'mimetype',
         'Size'          => 'size',
+        'StorageClass'  => 'storage_class',
     ];
 
     /**
@@ -265,9 +267,10 @@ class AwsS3Adapter extends AbstractAdapter
     public function copy($path, $newpath)
     {
         $options = $this->getOptions($newpath, [
-            'Bucket'     => $this->bucket,
-            'CopySource' => urlencode($this->bucket.'/'.$this->applyPathPrefix($path)),
-            'ACL'        => $this->getObjectACL($path),
+            'Bucket'       => $this->bucket,
+            'CopySource'   => urlencode($this->bucket.'/'.$this->applyPathPrefix($path)),
+            'ACL'          => $this->getObjectACL($path),
+            'StorageClass' => $this->getStorageClass($path),
         ]);
 
         $this->client->copyObject($options);
@@ -376,6 +379,19 @@ class AwsS3Adapter extends AbstractAdapter
         $metadata = $this->getVisibility($path);
 
         return $metadata['visibility'] === AdapterInterface::VISIBILITY_PUBLIC ? 'public-read' : 'private';
+    }
+
+    /**
+     * Return an object's storage class.
+     *
+     * @param $path
+     * @return string
+     */
+    public function getStorageClass($path)
+    {
+        $metadata = $this->getMetadata($path);
+
+        return !empty($metadata['storage_class']) ? $metadata['storage_class'] : StorageClass::STANDARD;
     }
 
     /**
