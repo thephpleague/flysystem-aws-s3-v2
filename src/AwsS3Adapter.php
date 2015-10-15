@@ -413,14 +413,24 @@ class AwsS3Adapter extends AbstractAdapter
      */
     public function listContents($dirname = '', $recursive = false)
     {
-        $objectsIterator = $this->client->getIterator('listObjects', [
+        $dirname = rtrim($dirname, '/') . '/';
+
+        $commandOptions = [
             'Bucket' => $this->bucket,
-            'Prefix' => $this->applyPathPrefix($dirname),
-        ]);
+            'Prefix' => $this->applyPathPrefix($dirname)
+        ];
+
+        $iteratorOptions = [];
+
+        if (!$recursive) {
+            $commandOptions['Delimiter'] = '/';
+            $iteratorOptions['return_prefixes'] = true;
+        }
+
+        $objectsIterator = $this->client->getIterator('listObjects', $commandOptions, $iteratorOptions);
 
         $contents = iterator_to_array($objectsIterator);
         $result = array_map([$this, 'normalizeResponse'], $contents);
-
         $result = array_filter($result, function ($value) {
             return $value['path'] !== false;
         });
@@ -438,7 +448,7 @@ class AwsS3Adapter extends AbstractAdapter
      */
     protected function normalizeResponse(array $object, $path = null)
     {
-        $result = ['path' => $path ?: $this->removePathPrefix($object['Key'])];
+        $result = ['path' => $path ?: $this->removePathPrefix(isset($object['Key']) ? $object['Key'] : $object['Prefix'])];
         $result['dirname'] = Util::dirname($result['path']);
 
         if (isset($object['LastModified'])) {
