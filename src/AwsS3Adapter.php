@@ -106,6 +106,16 @@ class AwsS3Adapter extends AbstractAdapter
     }
 
     /**
+     * Set the S3Client bucket. Used for overriding the default bucket.
+     *
+     * @param string $bucket
+     */
+    public function setBucket($bucket)
+    {
+        $this->bucket = $bucket;
+    }
+
+    /**
      * Get the S3Client instance.
      *
      * @return S3Client
