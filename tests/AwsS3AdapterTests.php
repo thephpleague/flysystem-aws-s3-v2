@@ -57,6 +57,16 @@ class AwsS3Tests extends PHPUnit_Framework_TestCase
         $this->assertEquals('bucket', $adapter->getBucket());
     }
 
+    public function testSetBucket()
+    {
+        $mock = $this->getS3Client();
+        $adapter = new Adapter($mock, 'bucket');
+        $this->assertEquals('bucket', $adapter->getBucket());
+
+        $adapter->setBucket('newBucket');
+        $this->assertEquals('newBucket', $adapter->getBucket());
+    }
+
     public function testGetClient()
     {
         $mock = $this->getS3Client();
