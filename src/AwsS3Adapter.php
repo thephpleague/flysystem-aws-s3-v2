@@ -6,6 +6,7 @@ use Aws\Common\Exception\MultipartUploadException;
 use Aws\S3\Enum\Group;
 use Aws\S3\Enum\Permission;
 use Aws\S3\Enum\StorageClass;
+use Aws\S3\Exception\NoSuchKeyException;
 use Aws\S3\Model\MultipartUpload\AbstractTransfer;
 use Aws\S3\Model\MultipartUpload\UploadBuilder;
 use Aws\S3\S3Client;
@@ -122,7 +123,23 @@ class AwsS3Adapter extends AbstractAdapter
     {
         $location = $this->applyPathPrefix($path);
 
-        return $this->client->doesObjectExist($this->bucket, $location);
+        try {
+            $this->client->headObject([
+                'Bucket' => $this->bucket,
+                'Key'    => $location,
+            ]);
+
+            return true;
+        } catch (NoSuchKeyException $e) {
+            // Maybe not actual key, but a prefix. Do a prefix listing of objects to determine.
+            $result = $this->client->listObjects([
+                'Bucket'  => $this->bucket,
+                'Prefix'  => rtrim($location, '/') . '/',
+                'MaxKeys' => 1,
+            ]);
+
+            return $result['Contents'] || $result['CommonPrefixes'];
+        }
     }
 
     /**

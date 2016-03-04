@@ -3,6 +3,7 @@
 use Aws\S3\Enum\Group;
 use Aws\S3\Enum\Permission;
 use Aws\S3\Enum\StorageClass;
+use Aws\S3\Exception\NoSuchKeyException;
 use Guzzle\Service\Resource\Model;
 use League\Flysystem\AwsS3v2\AwsS3Adapter as Adapter;
 use League\Flysystem\Config;
@@ -42,12 +43,21 @@ class AwsS3Tests extends PHPUnit_Framework_TestCase
         return Mockery::mock('Aws\S3\Model\MultipartUpload\AbstractTransfer');
     }
 
-    public function testHas()
+    public function testHasObject()
     {
         $mock = $this->getS3Client();
-        $mock->shouldReceive('doesObjectExist')->once()->andReturn(true);
+        $mock->shouldReceive('headObject')->once()->andReturn(true);
         $adapter = new Adapter($mock, 'bucketname');
         $this->assertTrue($adapter->has('something'));
+    }
+
+    public function testHasPrefix()
+    {
+        $mock = $this->getS3Client();
+        $mock->shouldReceive('headObject')->once()->andThrow(new NoSuchKeyException());
+        $mock->shouldReceive('listObjects')->once()->andReturn(new Model(['Contents' => [['Key' => 'directory/foo.txt']]]));
+        $adapter = new Adapter($mock, 'bucketname');
+        $this->assertTrue($adapter->has('directory'));
     }
 
     public function testGetBucket()
@@ -217,12 +227,11 @@ class AwsS3Tests extends PHPUnit_Framework_TestCase
     {
         $mock = $this->getS3Client();
         $this->expectVisibilityCall(Permission::READ, 'old', $mock);
-        $mock->shouldReceive('headObject')->once()->andReturn(Mockery::self());
+        $mock->shouldReceive('headObject')->twice()->andReturn(Mockery::self());
         $mock->shouldReceive('getAll')->once()->andReturn(['ContentLength' => 20, 'ContentType' => 'text/plain', 'StorageClass' => StorageClass::STANDARD]);
         $mock->shouldReceive('copyObject')->once()->andReturn(Mockery::self());
         $response = Mockery::mock('Guzzle\Service\Resource\Model');
         $mock->shouldReceive('deleteObject')->once()->andReturn($response);
-        $mock->shouldReceive('doesObjectExist')->once()->andReturn(true);
         $adapter = new Adapter($mock, 'bucketname');
         $result = $adapter->rename('old', 'new');
         $this->assertTrue($result);
